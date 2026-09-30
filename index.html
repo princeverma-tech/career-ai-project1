@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareerAI - AI Career Readiness Platform</title>
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons, Chart.js & html2pdf.js -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="auth-container">
+    <div class="auth-card card glass">
+      <div class="brand-header text-center">
+        <div class="logo-icon"><i data-lucide="rocket"></i></div>
+        <h2>CareerAI</h2>
+        <p class="subtitle">From Learning Skills to Career Readiness</p>
+      </div>
+      
+      <div class="demo-box">
+        <div class="flex-between">
+          <span><i data-lucide="zap" class="icon-sm"></i> <strong>Quick Demo Access</strong></span>
+          <button id="btn-fill-demo" class="btn btn-xs btn-primary">Load Demo</button>
+        </div>
+        <p class="font-xs text-subtle mt-xs">Email: aarav@careerai.io | Password: demo123</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tab-btn-login" class="auth-tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+        <button id="tab-btn-signup" class="auth-tab-btn" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="space-y-sm">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="student@university.edu" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full flex-center gap-xs justify-center">
+          <span>Sign In To Platform</span>
+          <i data-lucide="arrow-right" class="icon-sm"></i>
+        </button>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" class="space-y-sm hidden">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" placeholder="Aarav Sharma" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signup-email" placeholder="aarav@university.edu" required>
+        </div>
+        <div class="form-group">
+          <label>College / University</label>
+          <input type="text" id="signup-college" placeholder="IIT Delhi" required>
+        </div>
+        <div class="form-group">
+          <label>Target Job Role</label>
+          <input type="text" id="signup-role" placeholder="Full Stack Developer" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create CareerAI Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP LAYOUT -->
+  <div id="app-wrapper" class="app-layout hidden">
+    <!-- NAVBAR -->
+    <header class="app-header glass">
+      <div class="logo"><i data-lucide="rocket" class="brand-icon"></i> <span>CareerAI</span></div>
+      
+      <nav class="nav-links">
+        <button class="nav-item active" data-tab="dashboard"><i data-lucide="layout-dashboard" class="icon-sm"></i> <span>Dashboard</span></button>
+        <button class="nav-item" data-tab="assessment"><i data-lucide="file-check-2" class="icon-sm"></i> <span>Assessments</span></button>
+        <button class="nav-item" data-tab="roadmap"><i data-lucide="map" class="icon-sm"></i> <span>Roadmap</span></button>
+        <button class="nav-item" data-tab="projects"><i data-lucide="folder-code" class="icon-sm"></i> <span>Projects</span></button>
+        <button class="nav-item" data-tab="resume"><i data-lucide="file-text" class="icon-sm"></i> <span>ATS Resume</span></button>
+        <button class="nav-item" data-tab="interview"><i data-lucide="message-square-code" class="icon-sm"></i> <span>Voice Viva</span></button>
+        <button class="nav-item" data-tab="settings"><i data-lucide="settings" class="icon-sm"></i> <span>Settings</span></button>
+      </nav>
+
+      <div class="user-profile-summary">
+        <!-- THEME TOGGLE BUTTON -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" class="btn btn-xs btn-outline flex-center gap-xs" title="Toggle Theme">
+          <i data-lucide="sun" id="theme-icon" class="icon-sm"></i>
+        </button>
+
+        <!-- VOICE ASSISTANT BUTTON -->
+        <button id="voice-btn" onclick="toggleVoiceAssistant()" class="btn btn-xs btn-outline flex-center gap-xs" title="Voice Assistant">
+          <i data-lucide="mic" id="voice-icon" class="icon-sm"></i>
+          <span class="font-xs hidden-mobile">Voice AI</span>
+        </button>
+
+        <span id="header-streak-badge" class="badge streak-badge"><i data-lucide="flame" class="icon-sm"></i> <span id="streak-count">5</span> Day Streak</span>
+        
+        <!-- AVATAR WITH DP UPLOADER -->
+        <div class="avatar-wrapper" onclick="triggerDPUpload()" title="Change Profile Picture">
+          <img id="header-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="avatar-img">
+          <div class="avatar-overlay">
+            <i data-lucide="camera" class="icon-xs"></i>
+          </div>
+        </div>
+        <input type="file" id="dp-input" accept="image/*" class="hidden" onchange="handleDPChange(event)">
+
+        <button onclick="handleLogout()" class="btn btn-xs btn-outline-danger icon-only" title="Logout"><i data-lucide="log-out" class="icon-sm"></i></button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- DASHBOARD TAB -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="dashboard-header card glass">
+          <div class="flex-between flex-wrap gap-md">
+            <div>
+              <div class="flex-center gap-sm">
+                <h2 id="dash-user-name">Candidate Overview: Aarav Sharma</h2>
+                <button onclick="openEditProfileModal()" class="btn btn-xs btn-outline icon-only" title="Edit Profile"><i data-lucide="edit-3" class="icon-xs"></i></button>
+              </div>
+              <p class="subtitle mt-xs"><i data-lucide="graduation-cap" class="icon-sm"></i> <span id="dash-college">IIT Delhi</span> • Target: <strong id="dash-target-role" class="text-highlight">Full Stack Developer</strong></p>
+            </div>
+            <div class="readiness-banner">
+              <div>
+                <span class="text-subtle font-xs">Dynamic Readiness Score</span>
+                <p id="dash-milestone-text" class="font-xs">Calculated based on projects & skills</p>
+              </div>
+              <div id="dash-readiness-score" class="big-score">78%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-md">
+          <div class="card glass">
+            <div class="flex-between mb-sm">
+              <h3><i data-lucide="radar" class="icon-sm text-primary"></i> Readiness Radar</h3>
+              <span class="badge-subtle font-xs">Live Matrix</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="readinessChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass">
+            <h3><i data-lucide="alert-circle" class="icon-sm text-warning"></i> Priority Skill Gaps</h3>
+            <p class="subtitle font-xs mb-sm">Skills requiring immediate preparation</p>
+            <div id="skill-gap-cards-container" class="space-y-sm"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ASSESSMENT TAB -->
+      <section id="tab-assessment" class="tab-panel">
+        <div class="card glass">
+          <h2>Technical Skill Assessments</h2>
+          <p class="subtitle font-xs mb-sm">Take quick quizzes to dynamically recalculate your Readiness Score.</p>
+          <div id="quiz-container" class="mt-md space-y-sm">
+            <div id="quiz-question-box">
+              <h3 id="quiz-question">Question loading...</h3>
+              <div id="quiz-options" class="mt-sm space-y-sm"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROADMAP TAB -->
+      <section id="tab-roadmap" class="tab-panel">
+        <div class="card glass">
+          <div class="flex-between mb-sm">
+            <h2>Personalized Career Roadmap</h2>
+            <span class="badge">Completion: <strong id="roadmap-completion-pct">0%</strong></span>
+          </div>
+          <div id="roadmap-tasks-container" class="space-y-sm mt-md"></div>
+        </div>
+      </section>
+
+      <!-- PROJECTS TAB -->
+      <section id="tab-projects" class="tab-panel">
+        <div class="card glass">
+          <div class="flex-between mb-sm">
+            <div>
+              <h2>Project Portfolio</h2>
+              <p class="subtitle font-xs">Showcase production projects with live verification</p>
+            </div>
+            <button class="btn btn-primary btn-sm flex-center gap-xs" onclick="openAddProjectModal()">
+              <i data-lucide="plus" class="icon-sm"></i> Add Project
+            </button>
+          </div>
+          <div id="projects-grid" class="grid-2 mt-md"></div>
+        </div>
+      </section>
+
+      <!-- RESUME TAB -->
+      <section id="tab-resume" class="tab-panel">
+        <div class="card glass">
+          <h2>ATS Resume Scanner & Matcher</h2>
+          <p class="subtitle font-xs mb-sm">Paste your resume content to calculate keyword alignment with your target role.</p>
+          <textarea id="resume-text-input" rows="6" placeholder="Paste your plain text resume here..."></textarea>
+          <div class="flex-between mt-sm flex-wrap gap-sm">
+            <button class="btn btn-primary btn-sm" onclick="analyzeResume()">Analyze Match</button>
+            <button id="btn-export-pdf" class="btn btn-sm btn-outline flex-center gap-xs" onclick="exportResumePDF()">
+              <i data-lucide="download" class="icon-sm"></i> Export PDF
+            </button>
+            <div id="resume-score-display" class="font-sm font-bold text-highlight hidden">Match Score: <span id="resume-score-val">0%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIVA / MOCK INTERVIEW TAB -->
+      <section id="tab-interview" class="tab-panel">
+        <div class="card glass">
+          <div class="flex-between mb-sm">
+            <div>
+              <h2>AI Voice Viva & Mock Interview</h2>
+              <p class="subtitle font-xs">Speak your answers out loud for automated analysis and scoring.</p>
+            </div>
+            <span id="viva-score-badge" class="badge">Score: --/100</span>
+          </div>
+
+          <div class="interview-box card glass mt-md text-center space-y-sm">
+            <div id="viva-question-display" class="font-bold font-sm text-highlight">
+              Click "Start Interview Session" to begin.
+            </div>
+            
+            <p id="viva-status-text" class="font-xs text-subtle">Ready</p>
+
+            <div id="viva-transcript-box" class="gap-card text-left mt-sm font-xs" style="min-height: 60px; max-height: 100px; overflow-y: auto;">
+              <em>Your spoken response will appear here...</em>
+            </div>
+
+            <div class="flex-center justify-center gap-sm mt-md">
+              <button id="btn-start-viva" class="btn btn-primary btn-sm flex-center gap-xs" onclick="vivaEngine.startSession()">
+                <i data-lucide="play" class="icon-sm"></i> Start Session
+              </button>
+              <button id="btn-speak-viva" class="btn btn-outline btn-sm flex-center gap-xs" onclick="vivaEngine.listenAnswer()" disabled>
+                <i data-lucide="mic" class="icon-sm"></i> Record Answer
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS TAB -->
+      <section id="tab-settings" class="tab-panel">
+        <div class="card glass space-y-sm">
+          <h2>Profile & Platform Settings</h2>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="settings-name">
+          </div>
+          <div class="form-group">
+            <label>College/University</label>
+            <input type="text" id="settings-college">
+          </div>
+          <div class="form-group">
+            <label>Target Role</label>
+            <input type="text" id="settings-role">
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- PROFILE EDIT MODAL -->
+  <div id="edit-profile-modal" class="modal-overlay hidden">
+    <div class="modal-card card glass">
+      <div class="flex-between mb-sm">
+        <h3>Edit Candidate Profile</h3>
+        <button class="btn btn-xs btn-outline" onclick="closeEditProfileModal()"><i data-lucide="x" class="icon-sm"></i></button>
+      </div>
+      <form onsubmit="saveProfileModal(event)" class="space-y-sm">
+        <div class="form-group"><label>Name</label><input type="text" id="modal-name" required></div>
+        <div class="form-group"><label>College</label><input type="text" id="modal-college" required></div>
+        <div class="form-group"><label>Target Role</label><input type="text" id="modal-role" required></div>
+        <div class="flex-between mt-md">
+          <button type="button" class="btn btn-outline" onclick="closeEditProfileModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD PROJECT MODAL -->
+  <div id="add-project-modal" class="modal-overlay hidden">
+    <div class="modal-card card glass">
+      <div class="flex-between mb-sm">
+        <h3>Register New Project</h3>
+        <button class="btn btn-xs btn-outline" onclick="closeAddProjectModal()"><i data-lucide="x" class="icon-sm"></i></button>
+      </div>
+      <form onsubmit="submitNewProject(event)" class="space-y-sm">
+        <div class="form-group"><label>Title</label><input type="text" id="proj-title" placeholder="e.g. AI Career Portal" required></div>
+        <div class="form-group"><label>Description</label><textarea id="proj-desc" rows="2" placeholder="Short description..." required></textarea></div>
+        <div class="form-group"><label>Tech Stack</label><input type="text" id="proj-tech" placeholder="React, Node.js" required></div>
+        <div class="form-group"><label>Cover Image URL</label><input type="url" id="proj-image" placeholder="https://images.unsplash.com/..."></div>
+        <div class="form-group"><label>GitHub URL</label><input type="url" id="proj-github" placeholder="https://github.com/..."></div>
+        <div class="flex-between mt-md">
+          <button type="button" class="btn btn-outline" onclick="closeAddProjectModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
